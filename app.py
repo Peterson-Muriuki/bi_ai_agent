@@ -5,11 +5,7 @@ from src.visualizer import plot_numeric_data
 from groq import Groq
 
 # --- Initialize Groq client safely ---
-try:
-    api_key = st.secrets["GROQ_API_KEY"]
-except KeyError:
-    api_key = None
-
+api_key = st.secrets.get("GROQ_API_KEY", None)
 if api_key:
     client = Groq(api_key=api_key)
 else:
@@ -19,9 +15,15 @@ else:
     )
 
 # --- Streamlit page setup ---
-st.set_page_config(page_title="Business Intelligence AI Agent", page_icon="📊", layout="wide")
+st.set_page_config(
+    page_title="Business Intelligence AI Agent",
+    page_icon="📊",
+    layout="wide"
+)
 st.title("📊 Business Intelligence AI Agent")
-st.caption("Ask questions like: Top 5 products this quarter, Show revenue trends in Nairobi, Total revenue by region.")
+st.caption(
+    "Ask questions like: Top 5 products this quarter, Show revenue trends in Nairobi, Total revenue by region."
+)
 
 # --- User input ---
 user_query = st.text_input("Ask a business question:")
@@ -47,7 +49,7 @@ if user_query:
             st.dataframe(df, use_container_width=True)
 
             # Automatically plot numeric columns if they exist
-            numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns
-            if numeric_cols.any():
+            numeric_cols = df.select_dtypes(include=["float64", "int64"])
+            if not numeric_cols.empty:
                 st.subheader("📈 Visualizations")
                 plot_numeric_data(df)
