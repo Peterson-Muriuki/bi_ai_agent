@@ -1,12 +1,12 @@
 import pandas as pd
-from sqlalchemy import create_engine
-from src.config import DATABASE_URL
+from sqlalchemy import create_engine, text
 
-engine = create_engine(DATABASE_URL)
+DB_PATH = "sqlite:///data/sales.db"
+engine = create_engine(DB_PATH)
 
-def run_query(sql):
+def run_query(query: str) -> pd.DataFrame:
     try:
-        df = pd.read_sql(sql, engine)
-        return df
+        with engine.connect() as conn:
+            return pd.read_sql(text(query), conn)
     except Exception as e:
         return pd.DataFrame({"error": [str(e)]})
